@@ -4,7 +4,7 @@ set -eo pipefail
 if [[ "$1" == "-" ]]; then
   slug_file="$1"
 else
-  slug_file=/tmp/slug.tgz
+  slug_file=/product/slug.tgz
   if [[ "$1" ]]; then
     put_url="$1"
   fi
@@ -21,6 +21,7 @@ mkdir -p ${app_dir}
 mkdir -p ${cache_root}
 mkdir -p ${buildpack_root}
 mkdir -p ${build_root}/.profile.d
+mkdir -p /product
 
 output_redirect() {
   if [[ "${slug_file}" == "-" ]]; then

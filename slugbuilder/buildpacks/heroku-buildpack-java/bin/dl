@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+basedir=$(cd $(dirname ${BASH_SOURCE[*]}); pwd -P)
+pushd $basedir
+
+baseURL="${BASE_URL:-"http://52.68.20.57/resources"}"
+
+mkdir -p resources
+pushd resources
+wget "${baseURL}/maven-3.0.5.tar.gz" 
+wget "${baseURL}/maven-3.1.1.tar.gz"
+wget "${baseURL}/maven-3.2.5.tar.gz"
+wget "${baseURL}/openjdk1.6.0_27.tar.gz"
+wget "${baseURL}/openjdk1.7.0_55.tar.gz"
+wget "${baseURL}/openjdk1.7.0_95.tar.gz"
+wget "${baseURL}/openjdk1.8.0_20.tar.gz"
+wget "${baseURL}/openjdk1.8.0_74.tar.gz"
+wget "${baseURL}/openjdk1.9-latest.tar.gz"
+wget "${baseURL}/pgconfig.jar"
+popd
+
+popd
