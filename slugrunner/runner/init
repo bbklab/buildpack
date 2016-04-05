@@ -28,13 +28,16 @@ hash -r
 ## Inject "start" command to run processes defined in Procfile
 case "$1" in
   start)
-    if [[ -f Procfile ]]; then
-      command=$(ruby -r yaml -e "puts YAML.load_file('Procfile')['$2']")
-    elif [[ -f .release ]]; then
-      command=$(ruby -r yaml -e "puts (YAML.load_file('.release') || {}).fetch('default_process_types', {})['$2']")
+    if [ -f Procfile -a -s Procfile ]; then
+		if [ -n "$2" ]; then
+			command=$(ruby -r yaml -e "puts YAML.load_file('Procfile')['$2']")
+		else
+			command=$(head -n1 Procfile)
+			command=${command##*:}
+		fi
     else
-      echo "file: [Procfile] or [.release] required for command start"
-      exit 1
+		echo "file: [Procfile] required for command start"
+		exit 1
     fi
     ;;
   *)
@@ -43,7 +46,7 @@ case "$1" in
 esac
 
 ## Run!
-if [ "$command" == " ''" ]; then
+if [ -z "$command" ]; then
 	echo -e "empty startup command"
 	exit 1
 fi
