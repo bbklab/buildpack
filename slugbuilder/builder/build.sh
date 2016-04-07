@@ -93,7 +93,11 @@ prune_slugignore() {
 cd ${app_dir}
 
 ## Load source from STDIN
-cat | tar -xm
+if [ -z "${SOURCE_TAR_PATH}" ]; then
+	cat | tar -xm
+else
+	tar -xmf "${SOURCE_TAR_PATH}"
+fi
 
 
 if [[ -f "${env_cookie}" ]]; then
