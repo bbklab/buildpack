@@ -3,6 +3,7 @@ set -e
 
 repo=$1
 branch=$2
+lang=$3
 
 # check args
 if [ -z "$1" ]; then
@@ -26,7 +27,7 @@ docker inspect $runnerImg >/dev/null 2>&1 || docker pull $runnerImg
 
 # build source, result in /tmp/slug.tgz
 pushd "$prodName"
-tar -c -O . | docker run -i --rm -v /tmp:/product -a stdin -a stdout -a stderr $builderImg 
+tar -c -O . | docker run -e LANGUAGE="$lang" -i --rm -v /tmp:/product -a stdin -a stdout -a stderr $builderImg
 popd
 rm -rf "$prodName"
 

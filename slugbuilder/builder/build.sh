@@ -95,6 +95,8 @@ cd ${app_dir}
 ## Load source from STDIN
 if [ -z "${SOURCE_TAR_PATH}" ]; then
 	cat | tar -xm
+elif [ -z "${SOURCE_TAR_URL}" ]; then
+	curl -sS "${SOURCE_TAR_URL}" -o - | tar -xm
 else
 	tar -xmf "${SOURCE_TAR_PATH}"
 fi
@@ -178,6 +180,16 @@ if [[ -n "${BUILDPACK_URL}" ]]; then
   buildpacks=($buildpack)
   selected_buildpack=${buildpack[0]}
   buildpack_name=$(run_unprivileged ${buildpack}/bin/detect "${build_root}")
+
+elif [ -n "${LANGUAGE}" ]; then  # use specified buildpack
+	echo_title "using specified ${LANGUAGE} buildpack"
+	LANGUAGE="$(echo "${LANGUAGE}" | tr '[A-Z]' '[a-z]')"
+	prefix="${buildpack_root}/heroku-buildpack"
+	if [ -d "${prefix}-${LANGUAGE}" ]; then
+		buildpack_name="${LANGUAGE}"
+		selected_buildpack="${prefix}-${LANGUAGE}"
+	fi
+
 else
   for buildpack in "${buildpacks[@]}"; do
     buildpack_name=$(run_unprivileged ${buildpack}/bin/detect "${build_root}") \
