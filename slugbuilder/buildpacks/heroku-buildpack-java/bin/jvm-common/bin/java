@@ -47,7 +47,7 @@ install_java() {
     rm -rf "${jdkDir}"
     mkdir -p "${jdkDir}"
     validate_jdk_url ${jdkUrl} ${jdkVersion}
-    curl --retry 3 --location ${jdkUrl} --output ${jdkTarball}
+    curl -sS --retry 3 --location ${jdkUrl} --output ${jdkTarball}
     tar pxzf ${jdkTarball} -C "${jdkDir}"
     rm ${jdkTarball}
     echo "${javaVersion}" > "${jdkDir}/version"
@@ -196,6 +196,6 @@ _install_pgconfig() {
   local extDir="${javaHome}/jre/lib/ext"
 
   if [ -d "${extDir}" ] && [ -z "${SKIP_PGCONFIG_INSTALL:-}"  ]; then
-    curl --retry 3 -s -L file://${BIN_DIR}/resources/pgconfig.jar -o ${extDir}/pgconfig.jar
+    curl -sS --retry 3 -s -L file://${BIN_DIR}/resources/pgconfig.jar -o ${extDir}/pgconfig.jar
   fi
 }
