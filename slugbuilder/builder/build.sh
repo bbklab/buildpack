@@ -93,12 +93,12 @@ prune_slugignore() {
 cd ${app_dir}
 
 ## Load source from STDIN
-if [ -z "${SOURCE_TAR_PATH}" ]; then
-	cat | tar -xm
-elif [ -z "${SOURCE_TAR_URL}" ]; then
+if [ -n "${SOURCE_TAR_PATH}" ]; then
+	tar -xmf "${SOURCE_TAR_PATH}"
+elif [ -n "${SOURCE_TAR_URL}" ]; then
 	curl -sS "${SOURCE_TAR_URL}" -o - | tar -xm
 else
-	tar -xmf "${SOURCE_TAR_PATH}"
+	cat | tar -xm
 fi
 
 
