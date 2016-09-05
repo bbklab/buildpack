@@ -27,7 +27,7 @@ install_maven() {
 
     status_pending "Installing Maven ${mavenVersion}"
     if is_supported_maven_version ${mavenVersion}; then
-      mavenUrl="http://lang-jvm.s3.amazonaws.com/maven-${mavenVersion}.tar.gz"
+      mavenUrl="file://${BIN_DIR}/resources/maven-${mavenVersion}.tar.gz"
       download_maven ${mavenUrl} ${installDir} ${mavenHome}
       status_done
     else
@@ -43,7 +43,7 @@ download_maven() {
   local installDir=$2
   local mavenHome=$3
   rm -rf $mavenHome
-  curl --silent --max-time 60 --location ${mavenUrl} | tar xzm -C $installDir
+  curl -sS --max-time 60 --location ${mavenUrl} | tar xzm -C $installDir
   chmod +x $mavenHome/bin/mvn
 }
 

@@ -1,8 +1,11 @@
 FROM flynn/cedarish
 
 ADD ./builder/ /tmp/builder
-# Explicitly number the buildpacks directory based on the order of buildpacks.txt
-RUN nl -nrz /tmp/builder/buildpacks.txt | awk '{print $2 "\t" $1}' | xargs -L 1 /tmp/builder/install-buildpack /tmp/buildpacks && \
-    chown -R nobody:nogroup /tmp/buildpacks
+ADD ./buildpacks /tmp/buildpacks
+RUN chown -R nobody:nogroup /tmp/buildpacks
+
+ENV BASE_URL=http://52.68.20.57/resources
+RUN /tmp/buildpacks/heroku-buildpack-java/bin/dl
+
 ENTRYPOINT ["/tmp/builder/build.sh"]
 CMD []

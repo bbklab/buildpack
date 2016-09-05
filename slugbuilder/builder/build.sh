@@ -4,7 +4,7 @@ set -eo pipefail
 if [[ "$1" == "-" ]]; then
   slug_file="$1"
 else
-  slug_file=/tmp/slug.tgz
+  slug_file=/product/slug.tgz
   if [[ "$1" ]]; then
     put_url="$1"
   fi
@@ -21,6 +21,7 @@ mkdir -p ${app_dir}
 mkdir -p ${cache_root}
 mkdir -p ${buildpack_root}
 mkdir -p ${build_root}/.profile.d
+mkdir -p /product
 
 output_redirect() {
   if [[ "${slug_file}" == "-" ]]; then
@@ -92,7 +93,13 @@ prune_slugignore() {
 cd ${app_dir}
 
 ## Load source from STDIN
-cat | tar -xm
+if [ -n "${SOURCE_TAR_PATH}" ]; then
+	tar -xmf "${SOURCE_TAR_PATH}"
+elif [ -n "${SOURCE_TAR_URL}" ]; then
+	curl -sS "${SOURCE_TAR_URL}" -o - | tar -xm
+else
+	cat | tar -xm
+fi
 
 
 if [[ -f "${env_cookie}" ]]; then
@@ -173,6 +180,16 @@ if [[ -n "${BUILDPACK_URL}" ]]; then
   buildpacks=($buildpack)
   selected_buildpack=${buildpack[0]}
   buildpack_name=$(run_unprivileged ${buildpack}/bin/detect "${build_root}")
+
+elif [ -n "${LANGUAGE}" ]; then  # use specified buildpack
+	echo_title "using specified ${LANGUAGE} buildpack"
+	LANGUAGE="$(echo "${LANGUAGE}" | tr '[A-Z]' '[a-z]')"
+	prefix="${buildpack_root}/heroku-buildpack"
+	if [ -d "${prefix}-${LANGUAGE}" ]; then
+		buildpack_name="${LANGUAGE}"
+		selected_buildpack="${prefix}-${LANGUAGE}"
+	fi
+
 else
   for buildpack in "${buildpacks[@]}"; do
     buildpack_name=$(run_unprivileged ${buildpack}/bin/detect "${build_root}") \

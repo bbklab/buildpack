@@ -4,16 +4,16 @@ LATEST_JDK_VERSION="1.8"
 
 if [ ${STACK:-""} = "cedar" ]; then
   DEFAULT_JDK_VERSION="1.6"
-  JDK_URL_1_8=${JDK_URL_1_8:-"http://lang-jvm.s3.amazonaws.com/jdk/openjdk1.8.0_20.tar.gz"}
-  JDK_URL_1_7=${JDK_URL_1_7:-"http://lang-jvm.s3.amazonaws.com/jdk/openjdk1.7.0_55.tar.gz"}
-  JDK_URL_1_6=${JDK_URL_1_6:-"http://lang-jvm.s3.amazonaws.com/jdk/openjdk1.6.0_27.tar.gz"}
+  JDK_URL_1_8=file://${BIN_DIR}/resources/openjdk1.8.0_20.tar.gz
+  JDK_URL_1_7=file://${BIN_DIR}/resources/openjdk1.7.0_55.tar.gz
+  JDK_URL_1_6=file://${BIN_DIR}/resources/openjdk1.6.0_27.tar.gz
 else
   DEFAULT_JDK_VERSION="1.8"
   JDK_BASE_URL=${JDK_BASE_URL:-"http://lang-jvm.s3.amazonaws.com/jdk/cedar-14"}
-  JDK_URL_1_9=${JDK_URL_1_9:-"$JDK_BASE_URL/openjdk1.9-latest.tar.gz"}
-  JDK_URL_1_8=${JDK_URL_1_8:-"$JDK_BASE_URL/openjdk1.8.0_74.tar.gz"}
-  JDK_URL_1_7=${JDK_URL_1_7:-"$JDK_BASE_URL/openjdk1.7.0_95.tar.gz"}
-  JDK_URL_1_6=${JDK_URL_1_6:-"http://lang-jvm.s3.amazonaws.com/jdk/openjdk1.6.0_27.tar.gz"}
+  JDK_URL_1_9=file://${BIN_DIR}/resources/openjdk1.9-latest.tar.gz
+  JDK_URL_1_8=file://${BIN_DIR}/resources/openjdk1.8.0_74.tar.gz
+  JDK_URL_1_7=file://${BIN_DIR}/resources/openjdk1.7.0_95.tar.gz
+  JDK_URL_1_6=file://${BIN_DIR}/resources/openjdk1.6.0_27.tar.gz
 fi
 
 install_java_with_overlay() {
@@ -47,7 +47,7 @@ install_java() {
     rm -rf "${jdkDir}"
     mkdir -p "${jdkDir}"
     validate_jdk_url ${jdkUrl} ${jdkVersion}
-    curl --retry 3 --silent --location ${jdkUrl} --output ${jdkTarball}
+    curl -sS --retry 3 --location ${jdkUrl} --output ${jdkTarball}
     tar pxzf ${jdkTarball} -C "${jdkDir}"
     rm ${jdkTarball}
     echo "${javaVersion}" > "${jdkDir}/version"
@@ -67,23 +67,11 @@ install_java() {
 
 validate_jdk_url() {
   local jdkUrl=${1}
-  local jdkVersion={2}
-  status=$(curl --retry 3 --silent --head -w %{http_code} -L ${jdkUrl} -o /dev/null)
-  if [ "$status" != "200" ]; then
-    echo ""
-    error_return "Unsupported Java version: $javaVersion
-
-Please check your system.properties file to ensure the java.runtime.version
-is among the list of supported version on the Dev Center:
-https://devcenter.heroku.com/articles/java-support#supported-java-versions
-You can also remove the system.properties from your repo to install
-the default ${DEFAULT_JDK_VERSION} version.
-If you continue to have trouble, you can open a support ticket here:
-http://help.heroku.com
-
-Thanks,
-Heroku"
-    return 1
+  local jdkVersion=${2}
+  jdkUrl=$(echo -e "$jdkUrl" | sed -e 's#^file://##' )
+  if [ ! -e ${jdkUrl} ]; then
+      echo "Unsupported Java version: $jdkVersion"
+	  return 1
   fi
 }
 
@@ -208,6 +196,6 @@ _install_pgconfig() {
   local extDir="${javaHome}/jre/lib/ext"
 
   if [ -d "${extDir}" ] && [ -z "${SKIP_PGCONFIG_INSTALL:-}"  ]; then
-    curl --retry 3 -s -L "https://lang-jvm.s3.amazonaws.com/pgconfig.jar" -o ${extDir}/pgconfig.jar
+    curl -sS --retry 3 -s -L file://${BIN_DIR}/resources/pgconfig.jar -o ${extDir}/pgconfig.jar
   fi
 }
