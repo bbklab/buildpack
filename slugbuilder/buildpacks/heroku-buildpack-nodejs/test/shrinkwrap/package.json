@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "express": "4.10.4",
-    "lodash": "^2.4.0"
+    "lodash": "^4.17.21"
   },
   "engines": {
     "node": "~0.10.0"
