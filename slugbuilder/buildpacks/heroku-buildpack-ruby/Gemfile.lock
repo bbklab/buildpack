@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/hone/ruby-git.git
+  remote: https://github.com/hone/ruby-git.git
   revision: 264836fcff3c037d8d8fc44bd770b150b46fdc4e
   branch: master
   specs:
@@ -18,6 +18,7 @@ GEM
       progress (~> 2.4, >= 2.4.0)
       rest-client (~> 1.6, >= 1.6.7)
       thor (~> 0.15, >= 0.15.2)
+    concurrent-ruby (1.1.10)
     diff-lcs (1.1.3)
     excon (0.43.0)
     heroku-api (0.3.22)
@@ -32,7 +33,8 @@ GEM
       rrrretry (~> 1)
       thor (~> 0)
       threaded (~> 0)
-    i18n (0.7.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
     json (1.8.2)
     mime-types (2.4.3)
     minitest (5.5.1)
